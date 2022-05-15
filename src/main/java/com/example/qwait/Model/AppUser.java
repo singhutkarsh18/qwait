@@ -1,16 +1,13 @@
 package com.example.qwait.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.time.ZonedDateTime;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -31,6 +28,9 @@ public class AppUser implements UserDetails {
     private int otp;
 
 
+    @JsonIgnore
+    @OneToOne(mappedBy ="appUser")
+    private Store store;
     public AppUser(String name, String username, String password,int otp,Role role,String gender,Long mob) {
         this.name = name;
         this.username = username;
