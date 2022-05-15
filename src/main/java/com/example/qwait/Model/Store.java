@@ -21,12 +21,14 @@ public class Store {
     private Long id;
     private String name;
     private Integer counter;
+    private String location;
     private Integer billingTime;
     private Integer waitingTime;
-    private Integer peopleCount;
+    private Integer peopleCount=0;
+    private Integer lastCounter=0;
 
     @JsonIgnore
     @OneToMany(mappedBy = "store",cascade = CascadeType.ALL)
-    private Set<Customer> groups = new LinkedHashSet<>();
+    private Set<Customer> customers = new LinkedHashSet<>();
 
 }

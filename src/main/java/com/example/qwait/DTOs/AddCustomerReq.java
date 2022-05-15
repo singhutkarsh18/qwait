@@ -7,5 +7,4 @@ import lombok.Setter;
 public class AddCustomerReq {
     private String username;
     private Long storeId;
-    private String location;
 }

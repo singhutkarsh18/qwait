@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -24,8 +25,6 @@ public class AppUser implements UserDetails {
     private String password;
     private Long mob;
     private String gender;
-    private Integer counter;
-    private Boolean inQueue=false;
     private Boolean locked=true;
     private Boolean enabled=false;
     private Role role;
