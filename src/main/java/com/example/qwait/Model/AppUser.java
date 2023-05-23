@@ -3,19 +3,20 @@ package com.example.qwait.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 
 @Getter@Setter
-@Entity
+@Document
 public class AppUser implements UserDetails {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private Long id;
     private String name;
     private String username;
@@ -27,9 +28,6 @@ public class AppUser implements UserDetails {
     private Role role;
     private int otp;
 
-
-    @JsonIgnore
-    @OneToOne(mappedBy ="appUser")
     private Store store;
     public AppUser(String name, String username, String password,int otp,Role role,String gender,Long mob) {
         this.name = name;

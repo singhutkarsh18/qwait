@@ -10,5 +10,7 @@ public class StoreDetailsDTO {
     private Integer billingTime;
     private String latitude;
     private String longitude;
-
+    private String frm;
+    private String to;
+    private String about;
 }

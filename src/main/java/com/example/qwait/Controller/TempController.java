@@ -7,10 +7,7 @@ import com.example.qwait.Repository.StoreRepository;
 import com.example.qwait.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController@AllArgsConstructor
 @RequestMapping("/api")
@@ -28,5 +25,10 @@ public class TempController {
     public ResponseEntity<?> addStore(@RequestBody Store store)
     {
         return ResponseEntity.ok(storeRepository.save(store));
+    }
+    @GetMapping("/")
+    public String hello()
+    {
+        return "Hello";
     }
 }

@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
+
 import java.security.Principal;
 import java.util.Map;
 
@@ -83,7 +83,7 @@ public class SignUpController {
         {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e2.getLocalizedMessage());
         }
-        catch (EntityNotFoundException e3)
+        catch (IllegalArgumentException e3)
         {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(e3.getLocalizedMessage());
         }

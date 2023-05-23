@@ -1,5 +1,6 @@
 package com.example.qwait.Services;
 
+import ch.qos.logback.core.pattern.util.AsIsEscapeUtil;
 import com.example.qwait.DTOs.LocationDTO;
 import com.example.qwait.DTOs.StoreDetailsDTO;
 import com.example.qwait.Model.AppUser;
@@ -10,15 +11,12 @@ import com.example.qwait.Repository.StoreRepository;
 import com.example.qwait.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.persistence.EntityNotFoundException;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service@AllArgsConstructor
 public class StoreService {
@@ -30,63 +28,62 @@ public class StoreService {
     {
         AppUser appUser = userRepository.findByUsername(username).orElseThrow(IllegalStateException::new);
         Store store = storeRepository.findById(storeId).orElseThrow(IllegalStateException::new);
-        Integer peopleCount = store.getPeopleCount()+1;
-        Integer newCounter= ((peopleCount)%store.getCounter())==0?store.getCounter():(peopleCount)%store.getCounter();
-        ZonedDateTime entryTime= ZonedDateTime.now(ZoneId.of("Asia/Kolkata"));
-        Customer customer = new Customer(username,appUser.getName(),newCounter,entryTime,store);
-
-        int c=0;
-        for(var i : store.getCustomers())
+        store.setPeople(store.getPeople());
+        int minI=0,min=0;
+        for(int i=0;i<3;i++)
         {
-            if(Objects.equals(i.getCounterNo(), newCounter))
-                c++;
+            if(store.getUser1()<min)
+            {
+                min=store.getUser1();
+                minI=i;
+            }
         }
-        customer.setBillingTime(store.getBillingTime());
-        customer.setWaitingTime((c+1)*(store.getBillingTime()));
-        store.setPeopleCount(peopleCount);
+        Customer customer=new Customer(appUser.getUsername(),appUser.getName(),minI,ZonedDateTime.now(ZoneId.of("Asia/Kolkata")),store);
+        customer.setWaitingTime(store.getBillingTime()+min);
+        store.setWaitingTime(store.getBillingTime()+min);
         storeRepository.save(store);
         return customerRepo.save(customer);
     }
-    public String removeCustomer(String username,Long storeId)
-    {
-        AppUser appUser = userRepository.findByUsername(username).orElseThrow(IllegalStateException::new);
-        Store store = storeRepository.findById(storeId).orElseThrow(IllegalStateException::new);
-        long c=0;
-        for(var i:store.getCustomers())
-        {
-            if(i.getUsername().equals(appUser.getUsername()))
-                c=i.getId();
+//    public String removeCustomer(String username,Long storeId)
+//    {
+//        AppUser appUser = userRepository.findByUsername(username).orElseThrow(IllegalStateException::new);
+//        Store store = storeRepository.findById(storeId).orElseThrow(IllegalStateException::new);
+//        long c=0;
+//        for(var i:store.getCustomers())
+//        {
+//            if(i.getUsername().equals(appUser.getUsername()))
+//                c=i.getId();
+//
+//        }
+//        if(c==0)
+//            throw new EntityNotFoundException("customer not found in queue");
+//        int newPeopleCount=store.getPeopleCount()-1;
+//        store.setPeopleCount(newPeopleCount);
+//        ZonedDateTime old =customerRepo.findById(c).get().getEntryTime();
+//        ChronoUnit unit=ChronoUnit.MINUTES;
+//
+//        store.setWaitingTime(waitingTime(store,(int)unit.between(old, ZonedDateTime.now(ZoneId.of("Asia/Kolkata")))));
+//        storeRepository.save(store);
+//        customerRepo.deleteById(c);
+//        return "Customer removed";
+//    }
 
-        }
-        if(c==0)
-            throw new EntityNotFoundException("customer not found in queue");
-        int newPeopleCount=store.getPeopleCount()-1;
-        store.setPeopleCount(newPeopleCount);
-        ZonedDateTime old =customerRepo.findById(c).get().getEntryTime();
-        ChronoUnit unit=ChronoUnit.MINUTES;
-
-        store.setWaitingTime(waitingTime(store,(int)unit.between(old, ZonedDateTime.now(ZoneId.of("Asia/Kolkata")))));
-        storeRepository.save(store);
-        customerRepo.deleteById(c);
-        return "Customer removed";
-    }
-
-    public Integer waitingTime(Store store,Integer min)
-    {
-        return ( store.getWaitingTime() *(store.getPeopleCount())+min)/( store.getPeopleCount()+1);
-    }
+//    public Integer waitingTime(Store store,Integer min)
+//    {
+//        return ( store.getWaitingTime() *(store.getPeopleCount())+min)/( store.getPeopleCount()+1);
+//    }
     public List<Store> getStores(LocationDTO locationDTO)
     {
 
         List<Store> storeList = new ArrayList<>();
         for(Store store:storeRepository.findAll())
         {
-            if(inRange(locationDTO,store))
+            if(inRange(locationDTO,store)<2.0)
                 storeList.add(store);
         }
         return storeList;
     }
-    public Boolean inRange(LocationDTO locationDTO,Store store)
+    public double inRange(LocationDTO locationDTO,Store store)
     {
 
         var lon1 = Double.parseDouble(locationDTO.getLongitude())* Math.PI / 180;
@@ -103,18 +100,56 @@ public class StoreService {
         var c = 2 * Math.asin(Math.sqrt(a));
 
         var r = 6371;
-        return (c * r)<2;
+        System.out.println((c * r));
+        return (c * r);
     }
     public String addDetails( StoreDetailsDTO storeDetailsDTO, String username)
     {
+        System.out.println(username);
         Store store = storeRepository.findById(userRepository.findByUsername(username).get().getStore().getId()).get();
         store.setName(storeDetailsDTO.getName());
         store.setBillingTime(storeDetailsDTO.getBillingTime());
         store.setCounter(storeDetailsDTO.getCounter());
         store.setLatitude(storeDetailsDTO.getLatitude());
         store.setLongitude(storeDetailsDTO.getLongitude());
+        store.setFrm(storeDetailsDTO.getFrm());
+        store.setTo(storeDetailsDTO.getTo());
+        store.setAbout(storeDetailsDTO.getAbout());
         storeRepository.save(store);
         return "Details saved";
     }
 
+    public Set<Customer> getCustomersInStore(Long storeId)
+    {
+        if(storeRepository.findById(storeId).isEmpty())
+            throw new NoSuchElementException("Store not present");
+        return storeRepository.findById(storeId).get().getCustomers();
+    }
+
+    public Store getStore(Long storeId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(IllegalStateException::new);
+        return store;
+    }
+
+    public List<List<Customer>> getQueue(Long storeId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(IllegalStateException::new);
+        List<List<Customer>> a= new ArrayList<>();
+        for(int i=0;i<store.getCounter();i++)
+        {
+            a.add(new ArrayList<>());
+        }
+        for(Customer customer: store.getCustomers())
+        {
+            a.get(customer.getCounterNo()).add(customer);
+        }
+        return a;
+    }
+
+//    public List<Store> getCustomerQueue(String username) {
+//
+//    }
+//    public List<Store> getUserInQueue(String username)
+//    {
+//        return customerRepo.findAllByUsername(username).orElseThrow(NoSuchElementException::new);
+//    }
 }

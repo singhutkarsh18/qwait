@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
+
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
@@ -141,7 +141,7 @@ public class RegisterService {
             }
             if(!appUser.getEnabled())
             {
-                throw new EntityNotFoundException("Student not verified through otp");
+                throw new IllegalArgumentException("Student not verified through otp");
             }
             if(passwordEncoder.matches(passwordDto.getPassword(),appUser.getPassword()))
                 throw new UnsupportedOperationException("new password same as old password");
@@ -155,7 +155,6 @@ public class RegisterService {
             if(appUser.getRole().equals(Role.STORE)) {
                 Store store = new Store();
                 store.setWaitingTime(0);
-                store.setPeopleCount(0);
                 store.setBillingTime(0);
                 store.setAppUser(appUser);
                 storeRepository.save(store);
@@ -186,7 +185,7 @@ public class RegisterService {
     public String forgotPassword(String username) {
         if(!email_password_Validator(emailRegex,username))
             throw new IllegalStateException("Invalid email");
-        if(!userRepository.findByUsername(username).isPresent())
+        if(userRepository.findByUsername(username).isEmpty())
             throw new UsernameNotFoundException("User not found");
         AppUser appUser=userRepository.findByUsername(username).get();
         if(!appUser.getEnabled())
@@ -202,7 +201,7 @@ public class RegisterService {
     }
 
     public boolean authenticateStudent(String username, String password)  {
-        if(!userRepository.findByUsername(username).isPresent())
+        if(userRepository.findByUsername(username).isEmpty())
             throw new UsernameNotFoundException("User Not present");
         AppUser appUser=userRepository.findByUsername(username).get();
         if (!appUser.getEnabled())
@@ -227,8 +226,9 @@ public class RegisterService {
         if(!email_password_Validator(passwordRegex, passwordChangeDTO.getNewPassword()))
             throw new IllegalStateException("Password not valid");
         appUser.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
-        userRepository.saveAndFlush(appUser);
+        userRepository.save(appUser);
         return "Password changed";
     }
+
 
 }

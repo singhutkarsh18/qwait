@@ -6,10 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+
+import java.util.*;
 
 @Entity
 @Getter@Setter
@@ -23,21 +21,23 @@ public class Store {
     private Integer counter;
     private String latitude;
     private String longitude;
-    private Integer billingTime;
-    private Integer waitingTime;
-    private Integer peopleCount=0;
+    private Integer billingTime=0;
+    private Integer waitingTime=0;
+    private Integer people=0;
     private String frm;
     private String to;
     private String about;
+    private Integer user1=0;
+    private Integer user2=0;
+    private Integer user3=0;
 
-    public Store(String name, Integer counter, String latitude,String longitude, Integer billingTime, Integer waitingTime, Integer peopleCount ,AppUser appUser) {
+    public Store(String name, Integer counter, String latitude,String longitude, Integer billingTime, Integer waitingTime,Integer people,AppUser appUser) {
         this.name = name;
         this.counter = counter;
         this.latitude = latitude;
         this.longitude = longitude;
         this.billingTime = billingTime;
         this.waitingTime = waitingTime;
-        this.peopleCount = peopleCount;
         this.appUser = appUser;
     }
 

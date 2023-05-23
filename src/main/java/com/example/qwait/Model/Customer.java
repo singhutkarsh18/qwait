@@ -5,15 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
+
 import java.time.ZonedDateTime;
 
 @AllArgsConstructor@NoArgsConstructor
-@Entity@Getter@Setter
+@Document
+@Getter@Setter
 public class Customer {
-    @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Id
     private Long id;
     private String username;
     private String name;
@@ -21,8 +23,7 @@ public class Customer {
     private Integer waitingTime;
     private Integer billingTime;
     private ZonedDateTime entryTime;
-    @ManyToOne@JsonIgnore
-    @JoinColumn(name="store_id",referencedColumnName = "id")
+
     private Store store;
 
     public Customer(String username, String name, Integer counterNo, ZonedDateTime entryTime, Store store) {
